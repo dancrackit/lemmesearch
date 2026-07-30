@@ -1,6 +1,6 @@
 # 🔍 lemmesearch — Local RAG & Chat System
 
-**lemmesearch** is a self-hosted Retrieval-Augmented Generation (RAG) system. It combines a local semantic search engine (ChromaDB + Sentence Transformers) with LLM reasoning (via OpenRouter) and an elegant, Claude-style user interface.
+**lemmesearch** is a premium, self-hosted Retrieval-Augmented Generation (RAG) system. It combines a local semantic search engine (ChromaDB + Sentence Transformers) with advanced LLM reasoning (via OpenRouter) and an elegant, Claude-style user interface.
 
 ---
 
@@ -12,9 +12,9 @@
     *   *Multi-Query Expansion:* Analyzes follow-up prompts and chat history to generate optimized search variations.
     *   *Reciprocal Rank Fusion (RRF):* Merges results from query variations to find the most relevant document chunks.
     *   *Neighbor Window Context Expansion:* Re-stitches sibling chunks surrounding matching nodes to prevent context fragmentation and preserve sentence flow.
-*   **OpenRouter Integration:** Access any modern LLM (Claude, GPT, Kimi, Qwen, DeepSeek, etc.) from OpenRouter just by copying the model tag and It uses Server-Sent Events (SSE) token streaming.
-*   **Reasoning Mode & System Personas:** Configure reasoning effort levels (low, medium, high) for reasoning-capable models (e.g., gemma 4 31b, deepseek v4) and customize the system prompts directly through the UI.
-*   **Live Document Ingestion:** Drag-and-drop documents (only text based eg. - .docx, .pdf, .txt) and monitor chunking, text parsing (via PyMuPDF), and local embedding creation through a live progress bar.
+*   **OpenRouter Integration:** Access any modern LLM (Claude, GPT, Gemini, Llama, DeepSeek, etc.) with Server-Sent Events (SSE) token streaming.
+*   **Reasoning Mode & System Personas:** Configure reasoning effort levels (low, medium, high) for reasoning-capable models (e.g., DeepSeek R1, o1/o3-mini) and customize the system prompts directly through the UI.
+*   **Live Document Ingestion:** Drag-and-drop documents (PDF, TXT, etc.) and monitor chunking, text parsing (via PyMuPDF), and local embedding creation through a live progress bar.
 *   **Markdown-Based Local History:** Chats are automatically saved as clean, readable Markdown files inside the `credential/chat_history/` directory.
 
 ---
@@ -85,30 +85,36 @@ When you submit a query in search-enabled mode, the query undergoes several stag
 │   └── system_prompts.md  # Persona system prompts editable via UI.
 ├── UI.html                # Beautiful Claude-style RAG user interface.
 ├── pyproject.toml         # Project metadata and dependencies.
+├── requirements.txt       # Unified Python dependencies list.
+├── lemmesearch.py         # Cross-platform Python runner script.
 ├── lemmesearch.bat        # Windows launch script.
 └── README.md              # Documentation (This file).
 ```
 
 ---
 
-## ⚡ How to Setup & Run
+## ⚡ How to Setup & Run (All Platforms)
 
 ### Prerequisites
 *   Python **3.10** or higher.
 *   An active **OpenRouter API Key**.
 
-### Running the Application (Windows)
-Double-click `lemmesearch.bat` or run it from your terminal:
-```cmd
-lemmesearch.bat
-```
-This batch script will automatically:
-1.  Initialize a virtual environment (`.venv`) if one does not exist.
-2.  Migrate legacy credential/database structures if necessary.
-3.  Upgrade `pip` and install all required dependencies from `pyproject.toml`.
-4.  Launch the FastAPI server using `uvicorn` on **`http://127.0.0.1:7777`**.
+### Running the Application
+Using a single command, you can run `lemmesearch` on Windows, macOS, or Linux:
 
-Once the backend is running, open your web browser and navigate to:
+```bash
+python lemmesearch.py
+```
+
+This Python script automatically:
+1.  Creates a virtual environment (`.venv`) if one does not exist.
+2.  Performs data/credential migrations if legacy files exist.
+3.  Upgrades `pip` and installs required libraries from `requirements.txt`.
+4.  Starts the FastAPI backend server on **`http://127.0.0.1:7777`** .
+
+*Note for macOS/Linux users: Make sure Python is in your path. You may need to run `python3 lemmesearch.py` if `python` resolves to Python 2.x on your system.*
+
+Once the server starts, open your web browser and navigate to:
 👉 **`http://localhost:7777`**
 
 ---
