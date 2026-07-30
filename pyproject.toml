@@ -1,0 +1,22 @@
+[project]
+name = "lemmesearch"
+version = "0.1.0"
+description = "Local RAG System with ChromaDB, Sentence Transformers, and OpenRouter API"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.139.0",
+    "uvicorn>=0.51.0",
+    "pymupdf>=1.25.0",
+    "langchain-text-splitters>=1.1.0",
+    "sentence-transformers>=3.0.0",
+    "chromadb>=0.5.0",
+    "httpx>=0.28.0",
+    "python-multipart>=0.0.32",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["backend"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
