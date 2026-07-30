@@ -1,6 +1,6 @@
 # 🔍 lemmesearch — Local RAG & Chat System
 
-**lemmesearch** is a premium, self-hosted Retrieval-Augmented Generation (RAG) system. It combines a local semantic search engine (ChromaDB + Sentence Transformers) with advanced LLM reasoning (via OpenRouter) and an elegant, Claude-style user interface.
+**lemmesearch** is a self-hosted Retrieval-Augmented Generation (RAG) system. It combines a local semantic search engine (ChromaDB + Sentence Transformers) with LLM reasoning (via OpenRouter) and an elegant, Claude-style user interface.
 
 ---
 
@@ -12,9 +12,9 @@
     *   *Multi-Query Expansion:* Analyzes follow-up prompts and chat history to generate optimized search variations.
     *   *Reciprocal Rank Fusion (RRF):* Merges results from query variations to find the most relevant document chunks.
     *   *Neighbor Window Context Expansion:* Re-stitches sibling chunks surrounding matching nodes to prevent context fragmentation and preserve sentence flow.
-*   **OpenRouter Integration:** Access any modern LLM (Claude, GPT, Gemini, Llama, DeepSeek, etc.) with Server-Sent Events (SSE) token streaming.
-*   **Reasoning Mode & System Personas:** Configure reasoning effort levels (low, medium, high) for reasoning-capable models (e.g., DeepSeek R1, o1/o3-mini) and customize the system prompts directly through the UI.
-*   **Live Document Ingestion:** Drag-and-drop documents (PDF, TXT, etc.) and monitor chunking, text parsing (via PyMuPDF), and local embedding creation through a live progress bar.
+*   **OpenRouter Integration:** Access any modern LLM (Claude, GPT, Kimi, Qwen, DeepSeek, etc.) from OpenRouter just by copying the model tag and It uses Server-Sent Events (SSE) token streaming.
+*   **Reasoning Mode & System Personas:** Configure reasoning effort levels (low, medium, high) for reasoning-capable models (e.g., gemma 4 31b, deepseek v4) and customize the system prompts directly through the UI.
+*   **Live Document Ingestion:** Drag-and-drop documents (only text based eg. - .docx, .pdf, .txt) and monitor chunking, text parsing (via PyMuPDF), and local embedding creation through a live progress bar.
 *   **Markdown-Based Local History:** Chats are automatically saved as clean, readable Markdown files inside the `credential/chat_history/` directory.
 
 ---
