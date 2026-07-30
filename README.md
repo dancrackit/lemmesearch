@@ -1,0 +1,125 @@
+# 🔍 lemmesearch — Local RAG & Chat System
+
+**lemmesearch** is a premium, self-hosted Retrieval-Augmented Generation (RAG) system. It combines a local semantic search engine (ChromaDB + Sentence Transformers) with advanced LLM reasoning (via OpenRouter) and an elegant, Claude-style user interface.
+
+---
+
+## 🚀 Key Features
+
+*   **Claude-Inspired User Interface:** A beautiful, responsive frontend with a signature warm-linen light theme and charcoal dark theme. Features sidebar navigation, collapsible controls, and responsive styling.
+*   **Local Semantic Search Engine:** Powered by a local **ChromaDB** vector database and HuggingFace **Sentence Transformers** (`intfloat/e5-base-v2` by default). All text embeddings are generated locally on your machine.
+*   **Multi-Stage Retrieval Pipeline:**
+    *   *Multi-Query Expansion:* Analyzes follow-up prompts and chat history to generate optimized search variations.
+    *   *Reciprocal Rank Fusion (RRF):* Merges results from query variations to find the most relevant document chunks.
+    *   *Neighbor Window Context Expansion:* Re-stitches sibling chunks surrounding matching nodes to prevent context fragmentation and preserve sentence flow.
+*   **OpenRouter Integration:** Access any modern LLM (Claude, GPT, Gemini, Llama, DeepSeek, etc.) with Server-Sent Events (SSE) token streaming.
+*   **Reasoning Mode & System Personas:** Configure reasoning effort levels (low, medium, high) for reasoning-capable models (e.g., DeepSeek R1, o1/o3-mini) and customize the system prompts directly through the UI.
+*   **Live Document Ingestion:** Drag-and-drop documents (PDF, TXT, etc.) and monitor chunking, text parsing (via PyMuPDF), and local embedding creation through a live progress bar.
+*   **Markdown-Based Local History:** Chats are automatically saved as clean, readable Markdown files inside the `credential/chat_history/` directory.
+
+---
+
+## ⚙️ How It Works (System Architecture)
+
+The system is split into two primary components: a **FastAPI backend** that handles storage and vector searches, and a **Vanilla HTML/CSS/JS frontend** that delivers the chat experience.
+
+```mermaid
+graph TD
+    subgraph Frontend [UI.html]
+        A[User Input / Document Upload] -->|Drag & Drop File| B(SSE Ingestion Progress)
+        A -->|Chat Message| C(SSE Stream Handler)
+    end
+
+    subgraph Backend [FastAPI Server]
+        B -->|POST /api/ingest| D[Document Parser & Chunker]
+        D -->|Text Chunks| E[Local Sentence Transformer]
+        E -->|Dense Vectors| F[(ChromaDB)]
+        
+        C -->|POST /api/chat| G[Multi-Stage Retriever]
+        G -->|1. Query Expansion| H[Context & History Analyzer]
+        H -->|2. Similarity Search| F
+        F -->|3. Rank Candidates| I[Reciprocal Rank Fusion]
+        I -->|4. Stitch Context| J[Neighbor Window Expansion]
+        J -->|5. Build RAG Prompt| K[OpenRouter Streaming Client]
+    end
+
+    K -->|SSE Stream| C
+```
+
+### 1. The Ingestion Pipeline (`backend/parser.py`, `backend/embeddings.py`, `backend/db.py`)
+*   **Extraction:** When a document is uploaded, the backend extracts text using PyMuPDF.
+*   **Chunking:** The text is divided into manageable chunks using an overlapping character splitter.
+*   **Embedding:** Each chunk is converted into a 768-dimensional dense vector using the `intfloat/e5-base-v2` transformer model. Text passages are prefixed with `passage: ` for optimal alignment with the E5 schema.
+*   **Indexing:** The vectors are stored along with their metadata (document ID, filename, chunk index, parent text) in a ChromaDB database collection.
+
+### 2. The Multi-Stage Retrieval Pipeline (`backend/retrieval.py`)
+When you submit a query in search-enabled mode, the query undergoes several stages:
+1.  **Multi-Query Expansion:** If your query is a short follow-up or contains pronouns (like *"tell me more about it"*), the pipeline looks at the conversation history and expands it to include context (e.g., *"Topic of previous turn + tell me more about it"*).
+2.  **Vector Search:** The embedder generates vectors for each query variation (prefixed with `query: `). ChromaDB returns candidate lists for all queries.
+3.  **Reciprocal Rank Fusion (RRF):** The overlapping candidates from multiple searches are re-ranked using the RRF algorithm to ensure robust and highly relevant retrieval.
+4.  **Neighbor Window Expansion:** For each selected chunk, the retriever pulls the immediately preceding and succeeding sibling chunks from the database and merges them back together. This ensures the LLM sees complete paragraphs and contiguous logical concepts.
+
+### 3. Prompt Assembly & LLM Generation (`backend/llm.py`)
+*   The system formats a structured RAG prompt presenting the retrieved context alongside your question and conversation history.
+*   The payload is sent to the OpenRouter API. If **Reasoning Mode** is turned on, the reasoning effort parameter is sent to the model, and the reasoning tokens are streamed directly to the frontend.
+
+---
+
+## 📂 Project Structure
+
+```
+├── backend/
+│   ├── config.py          # Setting structures, API configuration, and path setups.
+│   ├── db.py              # ChromaDB vector store wrapper and index management.
+│   ├── embeddings.py      # Local SentenceTransformers wrapper.
+│   ├── llm.py             # Prompt formatting and OpenRouter SSE communication.
+│   ├── main.py            # FastAPI entry point.
+│   ├── parser.py          # Document parsing (PDF/TXT) and text splitting.
+│   ├── prompts.py         # Handles load/save actions for custom system instructions.
+│   ├── retrieval.py       # Multi-stage retrieval logic (Query expansion, RRF, Window expansion).
+│   └── router.py          # API endpoints (/ingest, /chat, /history, /credentials, etc.).
+├── credential/            # Stores configuration data.
+│   ├── chat_history/      # Markdown-based conversation history files.
+│   ├── models.md          # Active OpenRouter LLM model configuration.
+│   ├── openrouter_api_key.md # Encoded OpenRouter API key.
+│   └── system_prompts.md  # Persona system prompts editable via UI.
+├── UI.html                # Beautiful Claude-style RAG user interface.
+├── pyproject.toml         # Project metadata and dependencies.
+├── lemmesearch.bat        # Windows launch script.
+└── README.md              # Documentation (This file).
+```
+
+---
+
+## ⚡ How to Setup & Run
+
+### Prerequisites
+*   Python **3.10** or higher.
+*   An active **OpenRouter API Key**.
+
+### Running the Application (Windows)
+Double-click `lemmesearch.bat` or run it from your terminal:
+```cmd
+lemmesearch.bat
+```
+This batch script will automatically:
+1.  Initialize a virtual environment (`.venv`) if one does not exist.
+2.  Migrate legacy credential/database structures if necessary.
+3.  Upgrade `pip` and install all required dependencies from `pyproject.toml`.
+4.  Launch the FastAPI server using `uvicorn` on **`http://127.0.0.1:7777`**.
+
+Once the backend is running, open your web browser and navigate to:
+👉 **`http://localhost:7777`**
+
+---
+
+## 🛠️ API Endpoints
+
+*   **`GET /`**: Serves the `UI.html` frontend.
+*   **`POST /api/ingest`**: Uploads and chunks documents with real-time SSE progress streaming.
+*   **`GET /api/documents`**: Lists all active documents in ChromaDB.
+*   **`DELETE /api/documents/{doc_id}`**: Removes a specific document.
+*   **`DELETE /api/documents`**: Purges the entire knowledge database.
+*   **`POST /api/chat`**: SSE stream endpoint for LLM responses, incorporating retrieved chunks and chat history.
+*   **`GET /api/history`** & **`POST /api/history`**: Syncs and retrieves the Markdown-based chat histories.
+*   **`GET /api/credentials`** & **`POST /api/credentials`**: Configures API keys, model selections, and custom system prompts.
