@@ -13,7 +13,7 @@
     *   *Reciprocal Rank Fusion (RRF):* Merges results from query variations to find the most relevant document chunks.
     *   *Neighbor Window Context Expansion:* Re-stitches sibling chunks surrounding matching nodes to prevent context fragmentation and preserve sentence flow.
 *   **OpenRouter Integration:** Access any modern LLM (Claude, GPT, DeepSeek, Kimi, etc.) with Server-Sent Events (SSE) token streaming.
-*   **Reasoning Mode & System Personas:** Configure reasoning effort levels (low, medium, high) for reasoning-capable models (e.g., DeepSeek R1, o1/o3-mini) and customize the system prompts directly through the UI.
+*   **Reasoning Mode & System Personas:** Configure reasoning effort levels (low, medium, high) for reasoning-capable models (e.g., DeepSeek v4, gemma 4 31b, qwen 3.7 etc) and customize the system prompts directly through the UI.
 *   **Live Document Ingestion:** Drag-and-drop documents (only text based docs like PDF, TXT, PPT, Word, etc.) and monitor chunking, text parsing (via PyMuPDF), and local embedding creation through a live progress bar.
 *   **Markdown-Based Local History:** Chats are automatically saved as clean, readable Markdown files inside the `credential/chat_history/` directory.
 
