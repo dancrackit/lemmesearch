@@ -25,25 +25,26 @@ The system is split into two primary components: a **FastAPI backend** that hand
 
 ```mermaid
 graph TD
-    subgraph Frontend [UI.html]
-        A[User Input / Document Upload] -->|Drag & Drop File| B(SSE Ingestion Progress)
-        A -->|Chat Message| C(SSE Stream Handler)
+    subgraph UI [Frontend: UI.html]
+        User[User Interface]
     end
 
-    subgraph Backend [FastAPI Server]
-        B -->|POST /api/ingest| D[Document Parser & Chunker]
-        D -->|Text Chunks| E[Local Sentence Transformer]
-        E -->|Dense Vectors| F[(ChromaDB)]
-        
-        C -->|POST /api/chat| G[Multi-Stage Retriever]
-        G -->|1. Query Expansion| H[Context & History Analyzer]
-        H -->|2. Similarity Search| F
-        F -->|3. Rank Candidates| I[Reciprocal Rank Fusion]
-        I -->|4. Stitch Context| J[Neighbor Window Expansion]
-        J -->|5. Build RAG Prompt| K[OpenRouter Streaming Client]
+    subgraph Server [Backend: FastAPI Server]
+        Ingester[Document Ingester & Embedder]
+        DB[(ChromaDB Vector Store)]
+        Retriever[Multi-Stage Retriever]
+        LLM[OpenRouter API Client]
     end
 
-    K -->|SSE Stream| C
+    %% Ingestion Workflow
+    User -->|1. Drag-and-Drop / Upload| Ingester
+    Ingester -->|2. Parse & Embed Chunks| DB
+
+    %% Query / RAG Workflow
+    User -->|3. Submit Chat Prompt| Retriever
+    DB -->|4. Fetch Relevant Context| Retriever
+    Retriever -->|5. Build Enriched Prompt| LLM
+    LLM -->|6. Stream Response Output| User
 ```
 
 ### 1. The Ingestion Pipeline (`backend/parser.py`, `backend/embeddings.py`, `backend/db.py`)
