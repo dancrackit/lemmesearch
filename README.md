@@ -101,7 +101,7 @@ When you submit a query in search-enabled mode, the query undergoes several stag
 *   An active **OpenRouter API Key**.
 
 ### Running the Application
-Using a single command, you can run `lemmesearch` on Windows, macOS, or Linux:
+Using the following commands, you can run `lemmesearch` on Windows, macOS, or Linux:
 
 ```bash
 git clone https://github.com/dancrackit/lemmesearch
