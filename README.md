@@ -104,6 +104,12 @@ When you submit a query in search-enabled mode, the query undergoes several stag
 Using a single command, you can run `lemmesearch` on Windows, macOS, or Linux:
 
 ```bash
+git clone https://github.com/dancrackit/lemmesearch
+```
+```bash
+cd lemmesearch
+```
+```bash
 python lemmesearch.py
 ```
 
