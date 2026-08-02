@@ -1,4 +1,4 @@
-# 🔍 lemmesearch — Local RAG & Chat System
+# LemmeSearch — Local RAG & Chat System
 
 **lemmesearch** is a self-hosted Retrieval-Augmented Generation (RAG) system. It combines a local semantic search engine (ChromaDB + Sentence Transformers) with LLM reasoning (via OpenRouter) and an elegant, Claude-style user interface.
 
